@@ -199,7 +199,7 @@
   <div id="formView" class="hidden"></div>
 </div>
 
-<footer>Gesundheits-Tagebuch · v2 · Daten lokal im Browser (localStorage)</footer>
+<footer>Gesundheits-Tagebuch · v3 · Daten lokal im Browser (localStorage)</footer>
 
 <script>
 "use strict";
@@ -238,7 +238,7 @@ let store = loadAll();
 
 function emptyEntry(dateStr) {
   return {
-    date: dateStr, geraucht: null, trainiert: null, mittagessen: "", abendessen: "",
+    date: dateStr, geraucht: null, trainiert: null, stress: [], mittagessen: "", abendessen: "",
     proteinshake: { genommen: null, zeiten: [] },
     kreatin: { genommen: null, zeiten: [] },
     abend: { pc: false, pcBis: "", ferngesehen: false, sonstiges: "" },
@@ -338,6 +338,7 @@ function summaryTags(en){
   // Einflussfaktoren (neutral/blau)
   if (en.geraucht===true) add("","🚬 geraucht");
   if (en.trainiert===true) add("","🏋️ trainiert");
+  if (en.stress && en.stress.length) add("","😰 Stress "+en.stress.join("/"));
   if (en.proteinshake && en.proteinshake.genommen===true) add("","🥤 Shake");
   if (en.kreatin && en.kreatin.genommen===true) add("","💊 Kreatin");
   if (en.abend && en.abend.pc) add("","💻 PC"+(en.abend.pcBis?(" bis "+en.abend.pcBis):""));
@@ -368,6 +369,7 @@ let current = null;
 
 function openForm(key){
   const entry = store[key] ? JSON.parse(JSON.stringify(store[key])) : emptyEntry(key);
+  if (!Array.isArray(entry.stress)) entry.stress = [];
   current = { key, entry };
   buildForm();
   document.getElementById("calView").classList.add("hidden");
@@ -428,13 +430,27 @@ function buildForm(){
   let f = field("Geraucht?"); f.appendChild(ynControl(()=>e.geraucht, v=>e.geraucht=v).wrap); body.appendChild(f);
   f = field("Trainiert?"); f.appendChild(ynControl(()=>e.trainiert, v=>e.trainiert=v).wrap); body.appendChild(f);
 
+  f = field("Stress? (Mehrfachauswahl möglich)");
+  const stressChips=el("div","chips");
+  const stressOpts=[["morgens","Morgens"],["mittags","Mittags"],["abends","Abends"]];
+  stressOpts.forEach(([val,lab])=>{
+    const c=el("div","chip",lab); if(e.stress.includes(val)) c.classList.add("sel");
+    c.addEventListener("click", ()=>{
+      const i=e.stress.indexOf(val);
+      if(i>=0) e.stress.splice(i,1); else e.stress.push(val);
+      c.classList.toggle("sel");
+    });
+    stressChips.appendChild(c);
+  });
+  f.appendChild(stressChips); body.appendChild(f);
+
   f = field("Was zu Mittag gegessen?");
-  let ta=el("textarea"); ta.value=e.mittagessen; ta.placeholder="z. B. Nudeln mit Tomatensauce…";
-  ta.addEventListener("input", ()=>e.mittagessen=ta.value); f.appendChild(ta); body.appendChild(f);
+  const taMittag=el("textarea"); taMittag.value=e.mittagessen; taMittag.placeholder="z. B. Nudeln mit Tomatensauce…";
+  taMittag.addEventListener("input", ()=>e.mittagessen=taMittag.value); f.appendChild(taMittag); body.appendChild(f);
 
   f = field("Was zum Abendessen gegessen?");
-  ta=el("textarea"); ta.value=e.abendessen; ta.placeholder="z. B. Salat mit Hähnchen…";
-  ta.addEventListener("input", ()=>e.abendessen=ta.value); f.appendChild(ta); body.appendChild(f);
+  const taAbend=el("textarea"); taAbend.value=e.abendessen; taAbend.placeholder="z. B. Salat mit Hähnchen…";
+  taAbend.addEventListener("input", ()=>e.abendessen=taAbend.value); f.appendChild(taAbend); body.appendChild(f);
 
   f = field("Proteinshake getrunken?");
   f.appendChild(ynControl(()=>e.proteinshake.genommen, v=>e.proteinshake.genommen=v).wrap);
@@ -517,8 +533,8 @@ function buildForm(){
 
   body.appendChild(el("div","section-title","Notiz (optional)"));
   f = field("Sonstige Anmerkungen zum Tag");
-  ta=el("textarea"); ta.value=e.notiz; ta.addEventListener("input", ()=>e.notiz=ta.value);
-  f.appendChild(ta); body.appendChild(f);
+  const taNotiz=el("textarea"); taNotiz.value=e.notiz; taNotiz.addEventListener("input", ()=>e.notiz=taNotiz.value);
+  f.appendChild(taNotiz); body.appendChild(f);
 
   card.appendChild(body);
 
@@ -538,7 +554,7 @@ function buildForm(){
 
 function entryIsEmpty(e){
   const b=e.beschwerden;
-  return e.geraucht===null && e.trainiert===null && !e.mittagessen && !e.abendessen &&
+  return e.geraucht===null && e.trainiert===null && (e.stress||[]).length===0 && !e.mittagessen && !e.abendessen &&
     e.proteinshake.genommen===null && e.proteinshake.zeiten.length===0 &&
     e.kreatin.genommen===null && e.kreatin.zeiten.length===0 &&
     !e.abend.pc && !e.abend.ferngesehen && !e.abend.sonstiges &&
@@ -571,13 +587,13 @@ function exportJson(){
   download(JSON.stringify(payload,null,2), "gesundheits-tagebuch_"+todayKey()+".json", "application/json");
 }
 function exportCsv(){
-  const cols=["date","geraucht","trainiert","mittagessen","abendessen","proteinshake","proteinshake_zeiten",
+  const cols=["date","geraucht","trainiert","stress","mittagessen","abendessen","proteinshake","proteinshake_zeiten",
     "kreatin","kreatin_zeiten","abend_pc","abend_pc_bis","abend_tv","abend_sonstiges","bauchschmerzen",
     "bauchschmerzen_beschr","durchfall","blaehungen","sonstige_verdauung","sonstige_verdauung_beschr",
     "andere","andere_welche","schlaf","schlaf_zeiten","urindrang","urindrang_beschr","notiz"];
   const yn=v=>v===true?"ja":(v===false?"nein":"");
   const rows=Object.keys(store).sort().map(k=>{ const e=store[k],b=e.beschwerden;
-    return [e.date,yn(e.geraucht),yn(e.trainiert),e.mittagessen,e.abendessen,yn(e.proteinshake.genommen),
+    return [e.date,yn(e.geraucht),yn(e.trainiert),(e.stress||[]).join(" "),e.mittagessen,e.abendessen,yn(e.proteinshake.genommen),
       e.proteinshake.zeiten.join(" "),yn(e.kreatin.genommen),e.kreatin.zeiten.join(" "),
       e.abend.pc?"ja":"",e.abend.pcBis,e.abend.ferngesehen?"ja":"",e.abend.sonstiges,
       yn(b.bauchschmerzen.ja),b.bauchschmerzen.beschreibung,yn(b.durchfall),yn(b.blaehungen),
