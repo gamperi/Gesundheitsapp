@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Gesundheits-Tagebuch</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Gesundheit">
+<meta name="theme-color" content="#C85A4A">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAB8ElEQVR42u3dQREAIAhFQfIZwcS2wgxycmD/vATM3omzl1QunEAACSABJIAkgASQABJAEkACSAAJIAkgASSABJAEkAASQAJIAEkACSABJIAkgASQABJAEkAC6Ln8YwABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEECjAKW15gsQQAAZQAYQQAABBBBABpABBBBAAAEEkAFkABlAAAEEEEAAGUAGEEAAAQQQQAaQAQQQQAABBJABZAABBBBAAAFkABlABhBAAAEEEEAGkAEEEEAAAQSQAWQAAQQQQAABZAAZQAABBBBAAFkbQL71pG89AAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAJIAkgACSABJIAkgASQABJAEkACSAAJIAkgASSABJAEkAASQAJIALmCABJAAkgASQAJIAGkAV19C3VrW/QQ3wAAAABJRU5ErkJggg==">
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAB8ElEQVR42u3dQREAIAhFQfIZwcS2wgxycmD/vATM3omzl1QunEAACSABJIAkgASQABJAEkACSAAJIAkgASSABJAEkAASQAJIAEkACSABJIAkgASQABJAEkAC6Ln8YwABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEECjAKW15gsQQAAZQAYQQAABBBBABpABBBBAAAEEkAFkABlAAAEEEEAAGUAGEEAAAQQQQAaQAQQQQAABBJABZAABBBBAAAFkABlABhBAAAEEEEAGkAEEEEAAAQSQAWQAAQQQQAABZAAZQAABBBBAAFkbQL71pG89AAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAJIAkgACSABJIAkgASQABJAEkACSAAJIAkgASSABJAEkAASQAJIALmCABJAAkgASQAJIAGkAV19C3VrW/QQ3wAAAABJRU5ErkJggg==">
+<style>
+  :root {
+    --bg: #F0F2F5;
+    --card: #FBF6EC;
+    --accent: #C85A4A;
+    --accent-soft: #e7b3aa;
+    --blue: #5B8FB9;
+    --text: #2c2c2c;
+    --muted: #7a7a7a;
+    --line: #dcdcdc;
+    --ok: #5a9367;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-text-size-adjust: 100%;
+  }
+  header {
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+    padding: max(14px, env(safe-area-inset-top)) 16px 14px;
+    position: sticky; top: 0; z-index: 10;
+  }
+  header h1 { margin: 0; font-size: 19px; }
+  .privacy { font-size: 12px; color: var(--muted); margin-top: 4px; display: flex; align-items: center; gap: 5px; }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 16px; }
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  button {
+    font-family: inherit; font-size: 14px; cursor: pointer;
+    border: 1px solid var(--line); background: #fff; color: var(--text);
+    border-radius: 8px; padding: 9px 13px; transition: background .12s;
+  }
+  button:hover { background: #f3f3f3; }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button.primary:hover { background: #b34d3e; }
+  button.ghost { background: transparent; }
+  button.danger { color: var(--accent); border-color: var(--accent-soft); }
+
+  /* Monat/Woche-Umschalter */
+  .view-switch { display: inline-flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; margin-bottom: 12px; background:#fff; }
+  .seg { border: none; border-radius: 0; background: #fff; padding: 8px 18px; color: var(--muted); font-weight: 600; }
+  .seg + .seg { border-left: 1px solid var(--line); }
+  .seg.sel { background: var(--blue); color: #fff; }
+
+  /* Kalender */
+  .cal-card { background: var(--card); border-radius: 14px; box-shadow: var(--shadow); padding: 14px; }
+  .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .cal-head .month { font-size: 16px; font-weight: 600; }
+  .cal-nav button { padding: 6px 11px; }
+  .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+  .dow { text-align: center; font-size: 11px; color: var(--muted); padding: 4px 0; font-weight: 600; }
+  .day {
+    aspect-ratio: 1 / 1; border-radius: 9px; border: 1px solid transparent;
+    background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 14px; cursor: pointer; position: relative; user-select: none;
+  }
+  .day:hover { border-color: var(--accent-soft); }
+  .day.empty { background: transparent; cursor: default; }
+  .day.today { border-color: var(--blue); font-weight: 700; }
+  .day.has-entry { background: #f3e6cf; }
+  .day .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); position: absolute; bottom: 7px; }
+  .day .badge { position: absolute; top: 5px; right: 6px; font-size: 9px; color: var(--accent); }
+
+  /* Wochenübersicht */
+  .week-card { background: var(--card); border-radius: 14px; box-shadow: var(--shadow); padding: 14px; }
+  .week-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .week-head .label { font-size: 16px; font-weight: 600; }
+  .wday {
+    display: flex; gap: 10px; align-items: flex-start; padding: 10px; border-radius: 10px;
+    background: #fff; border: 1px solid var(--line); margin-bottom: 8px; cursor: pointer;
+  }
+  .wday:hover { border-color: var(--accent-soft); }
+  .wday.today { border-color: var(--blue); }
+  .wday .dcol { min-width: 46px; text-align: center; }
+  .wday .dnum { font-size: 20px; font-weight: 700; line-height: 1; }
+  .wday .dname { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .wday .scol { flex: 1; display: flex; flex-wrap: wrap; gap: 5px; align-items: center; min-height: 28px; }
+  .tag { font-size: 12px; padding: 3px 9px; border-radius: 14px; background: #eef3f7; color: #3f6a8a; white-space: nowrap; }
+  .tag.b { background: #f6e1dd; color: var(--accent); }
+  .tag.muted { background: transparent; color: var(--muted); font-style: italic; padding-left: 0; }
+
+  /* Formular */
+  .form-card { background: var(--card); border-radius: 14px; box-shadow: var(--shadow); padding: 0; margin-top: 4px; overflow: hidden; }
+  .form-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--line); background: #fff; }
+  .form-head .date-title { font-size: 16px; font-weight: 600; }
+  .form-body { padding: 16px; }
+  .section-title { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--accent); font-weight: 700; margin: 22px 0 10px; }
+  .section-title:first-child { margin-top: 4px; }
+  .field { margin-bottom: 14px; }
+  .field > label.q { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  input[type=text], input[type=time], textarea {
+    width: 100%; font-family: inherit; font-size: 14px; padding: 9px 10px;
+    border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--text);
+  }
+  textarea { resize: vertical; min-height: 44px; }
+  .sub { margin-top: 8px; border-left: 2px solid var(--accent-soft); padding-left: 10px; }
+  .sub-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; display:block; }
+
+  .yn { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .yn button { border: none; border-radius: 0; background: #fff; padding: 8px 16px; font-size: 13px; color: var(--muted); }
+  .yn button + button { border-left: 1px solid var(--line); }
+  .yn button.sel-yes { background: var(--accent); color: #fff; }
+  .yn button.sel-no { background: #e3e3e3; color: var(--text); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { border: 1px solid var(--line); background: #fff; border-radius: 20px; padding: 8px 14px; font-size: 13px; cursor: pointer; color: var(--muted); }
+  .chip.sel { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .chk { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; padding: 4px 0; }
+  .chk input { width: 18px; height: 18px; accent-color: var(--accent); }
+
+  .times { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+  .time-pill { display: inline-flex; align-items: center; gap: 4px; background:#fff; border:1px solid var(--line); border-radius: 20px; padding: 3px 6px 3px 10px; }
+  .time-pill input[type=time] { border: none; padding: 4px; width: 90px; }
+  .time-pill .rm { border:none; background:transparent; color: var(--accent); font-size:16px; line-height:1; padding: 2px 6px; cursor:pointer; }
+  .add-time { font-size: 13px; padding: 7px 12px; }
+
+  .form-foot { display: flex; gap: 8px; justify-content: space-between; align-items: center; padding: 14px 16px; border-top: 1px solid var(--line); background: #fff; position: sticky; bottom: 0; }
+  .saved-note { font-size: 12px; color: var(--ok); }
+  .hidden { display: none !important; }
+  .empty-state { text-align: center; color: var(--muted); font-size: 14px; padding: 26px 10px; }
+  .file-input { display: none; }
+  footer { text-align: center; color: var(--muted); font-size: 11px; padding: 18px; }
+  @media (max-width: 480px) {
+    .day { font-size: 13px; }
+    header h1 { font-size: 17px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap" style="padding:0;">
+    <h1>🩺 Gesundheits-Tagebuch</h1>
+    <div class="privacy">🔒 Alle Daten bleiben lokal auf diesem Gerät — kein Server, keine Cloud.</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="toolbar">
+    <button class="primary" id="btnToday">Heute eintragen</button>
+    <button id="btnExport">⬇︎ Export (JSON)</button>
+    <button id="btnExportCsv">⬇︎ Export (CSV)</button>
+    <button id="btnImport">⬆︎ Import</button>
+    <input type="file" id="fileInput" class="file-input" accept="application/json,.json">
+  </div>
+
+  <div id="calView">
+    <div class="view-switch">
+      <button id="modeMonth" class="seg sel">Monat</button>
+      <button id="modeWeek" class="seg">Woche</button>
+    </div>
+
+    <div id="monthWrap">
+      <div class="cal-card">
+        <div class="cal-head">
+          <div class="month" id="monthLabel"></div>
+          <div class="cal-nav">
+            <button id="prevMonth" aria-label="Vorheriger Monat">‹</button>
+            <button id="nextMonth" aria-label="Nächster Monat">›</button>
+          </div>
+        </div>
+        <div class="grid" id="dowRow"></div>
+        <div class="grid" id="calGrid"></div>
+      </div>
+    </div>
+
+    <div id="weekWrap" class="hidden">
+      <div class="week-card">
+        <div class="week-head">
+          <div class="label" id="weekLabel"></div>
+          <div class="cal-nav">
+            <button id="prevWeek" aria-label="Vorherige Woche">‹</button>
+            <button id="nextWeek" aria-label="Nächste Woche">›</button>
+          </div>
+        </div>
+        <div id="weekList"></div>
+      </div>
+    </div>
+
+    <div class="empty-state" id="calHint">Tippe auf einen Tag, um einen Eintrag anzulegen oder zu bearbeiten.</div>
+  </div>
+
+  <div id="formView" class="hidden"></div>
+</div>
+
+<footer>Gesundheits-Tagebuch · v3 · Daten lokal im Browser (localStorage)</footer>
+
+<script>
+"use strict";
+const ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAB8ElEQVR42u3dQREAIAhFQfIZwcS2wgxycmD/vATM3omzl1QunEAACSABJIAkgASQABJAEkACSAAJIAkgASSABJAEkAASQAJIAEkACSABJIAkgASQABJAEkAC6Ln8YwABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEECjAKW15gsQQAAZQAYQQAABBBBABpABBBBAAAEEkAFkABlAAAEEEEAAGUAGEEAAAQQQQAaQAQQQQAABBJABZAABBBBAAAFkABlABhBAAAEEEEAGkAEEEEAAAQSQAWQAAQQQQAABZAAZQAABBBBAAFkbQL71pG89AAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAABBBBAAAEEEEAAAQQQQAJIAkgACSABJIAkgASQABJAEkACSAAJIAkgASSABJAEkAASQAJIALmCABJAAkgASQAJIAGkAV19C3VrW/QQ3wAAAABJRU5ErkJggg==";
+
+// PWA-Manifest zur Laufzeit (für „Zum Startbildschirm hinzufügen" auf Android/Chrome)
+(function injectManifest(){
+  try {
+    const manifest = {
+      name: "Gesundheits-Tagebuch", short_name: "Gesundheit",
+      start_url: ".", scope: ".", display: "standalone",
+      background_color: "#F0F2F5", theme_color: "#C85A4A",
+      icons: [
+        { src: ICON, sizes: "192x192", type: "image/png", purpose: "any" },
+        { src: ICON, sizes: "512x512", type: "image/png", purpose: "any maskable" }
+      ]
+    };
+    const blob = new Blob([JSON.stringify(manifest)], {type:"application/manifest+json"});
+    const link = document.createElement("link");
+    link.rel = "manifest"; link.href = URL.createObjectURL(blob);
+    document.head.appendChild(link);
+  } catch(e) { /* egal, App läuft auch ohne Manifest */ }
+})();
+
+// ---------- Daten ----------
+const STORAGE_KEY = "gesundheitsapp.entries.v1";
+const WEEKDAYS = ["Mo","Di","Mi","Do","Fr","Sa","So"];
+const MONTHS = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+
+function loadAll() {
+  try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : {}; }
+  catch (e) { console.error("Laden fehlgeschlagen", e); return {}; }
+}
+function saveAll(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+let store = loadAll();
+
+function emptyEntry(dateStr) {
+  return {
+    date: dateStr, geraucht: null, trainiert: null, stress: [], mittagessen: "", abendessen: "",
+    proteinshake: { genommen: null, zeiten: [] },
+    kreatin: { genommen: null, zeiten: [] },
+    abend: { pc: false, pcBis: "", ferngesehen: false, sonstiges: "" },
+    beschwerden: {
+      bauchschmerzen: { ja: null, beschreibung: "" },
+      durchfall: null, blaehungen: null,
+      sonstigeVerdauung: { ja: null, beschreibung: "" },
+      andere: { ja: null, welche: "" },
+      schlaf: "", schlafZeiten: [],
+      urindrang: { ja: null, beschreibung: "" }
+    },
+    notiz: ""
+  };
+}
+
+// ---------- Datum-Helfer ----------
+function pad(n){ return String(n).padStart(2,"0"); }
+function toKey(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+function todayKey(){ return toKey(new Date()); }
+function parseKey(k){ const [y,m,dd]=k.split("-").map(Number); return new Date(y, m-1, dd); }
+function mondayOf(d){ const x=new Date(d); const off=(x.getDay()+6)%7; x.setDate(x.getDate()-off); x.setHours(0,0,0,0); return x; }
+function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function prettyDate(k){ const d=parseKey(k); return WEEKDAYS[(d.getDay()+6)%7]+", "+d.getDate()+". "+MONTHS[d.getMonth()]+" "+d.getFullYear(); }
+
+// ---------- Ansichts-Status ----------
+let viewMode = "month";
+let viewYear, viewMonth, weekRef;
+(function initView(){ const t=new Date(); viewYear=t.getFullYear(); viewMonth=t.getMonth(); weekRef=mondayOf(t); })();
+
+function setMode(m){
+  viewMode = m;
+  document.getElementById("modeMonth").classList.toggle("sel", m==="month");
+  document.getElementById("modeWeek").classList.toggle("sel", m==="week");
+  document.getElementById("monthWrap").classList.toggle("hidden", m!=="month");
+  document.getElementById("weekWrap").classList.toggle("hidden", m!=="week");
+  if (m==="month") renderCalendar(); else renderWeek();
+}
+
+// ---------- Monatskalender ----------
+function renderDow(){
+  const row = document.getElementById("dowRow"); row.innerHTML="";
+  WEEKDAYS.forEach(w => { const c=document.createElement("div"); c.className="dow"; c.textContent=w; row.appendChild(c); });
+}
+function renderCalendar(){
+  document.getElementById("monthLabel").textContent = MONTHS[viewMonth]+" "+viewYear;
+  const grid = document.getElementById("calGrid"); grid.innerHTML="";
+  const first = new Date(viewYear, viewMonth, 1);
+  const startOffset = (first.getDay()+6)%7;
+  const daysInMonth = new Date(viewYear, viewMonth+1, 0).getDate();
+  const tKey = todayKey();
+  for (let i=0;i<startOffset;i++){ const e=document.createElement("div"); e.className="day empty"; grid.appendChild(e); }
+  for (let d=1; d<=daysInMonth; d++){
+    const cell=document.createElement("div"); cell.className="day";
+    const key=viewYear+"-"+pad(viewMonth+1)+"-"+pad(d);
+    if (key===tKey) cell.classList.add("today");
+    const num=document.createElement("span"); num.textContent=d; cell.appendChild(num);
+    if (store[key]){
+      cell.classList.add("has-entry");
+      const dot=document.createElement("span"); dot.className="dot"; cell.appendChild(dot);
+      if (hasBeschwerde(store[key])){ const b=document.createElement("span"); b.className="badge"; b.textContent="!"; cell.appendChild(b); }
+    }
+    cell.addEventListener("click", ()=>openForm(key));
+    grid.appendChild(cell);
+  }
+}
+
+// ---------- Wochenübersicht ----------
+function el(tag, cls, txt){ const e=document.createElement(tag); if(cls)e.className=cls; if(txt!=null)e.textContent=txt; return e; }
+
+function renderWeek(){
+  const start = mondayOf(weekRef);
+  const end = addDays(start,6);
+  const lab = start.getDate()+". "+MONTHS[start.getMonth()].slice(0,3)+" – "+end.getDate()+". "+MONTHS[end.getMonth()].slice(0,3)+" "+end.getFullYear();
+  document.getElementById("weekLabel").textContent = lab;
+  const list = document.getElementById("weekList"); list.innerHTML="";
+  const tKey = todayKey();
+  for (let i=0;i<7;i++){
+    const d = addDays(start,i); const key=toKey(d);
+    const row = el("div","wday"); if (key===tKey) row.classList.add("today");
+    const dcol = el("div","dcol");
+    dcol.appendChild(el("div","dnum", String(d.getDate())));
+    dcol.appendChild(el("div","dname", WEEKDAYS[i]));
+    row.appendChild(dcol);
+    const scol = el("div","scol");
+    const en = store[key];
+    if (!en){ scol.appendChild(el("span","tag muted","kein Eintrag")); }
+    else { summaryTags(en).forEach(t => scol.appendChild(t)); }
+    row.appendChild(scol);
+    row.addEventListener("click", ()=>openForm(key));
+    list.appendChild(row);
+  }
+}
+
+function summaryTags(en){
+  const out = [];
+  const add = (cls,txt) => out.push(el("span","tag"+(cls?(" "+cls):""), txt));
+  // Einflussfaktoren (neutral/blau)
+  if (en.geraucht===true) add("","🚬 geraucht");
+  if (en.trainiert===true) add("","🏋️ trainiert");
+  if (en.stress && en.stress.length) add("","😰 Stress "+en.stress.join("/"));
+  if (en.proteinshake && en.proteinshake.genommen===true) add("","🥤 Shake");
+  if (en.kreatin && en.kreatin.genommen===true) add("","💊 Kreatin");
+  if (en.abend && en.abend.pc) add("","💻 PC"+(en.abend.pcBis?(" bis "+en.abend.pcBis):""));
+  // Beschwerden (rot)
+  const b = en.beschwerden||{};
+  if (b.bauchschmerzen && b.bauchschmerzen.ja) add("b","Bauchschmerzen");
+  if (b.durchfall) add("b","Durchfall");
+  if (b.blaehungen) add("b","Blähungen");
+  if (b.sonstigeVerdauung && b.sonstigeVerdauung.ja) add("b","Verdauung");
+  if (b.andere && b.andere.ja) add("b", b.andere.welche ? ("⚠ "+b.andere.welche) : "andere Beschwerde");
+  if (b.schlaf==="unruhig") add("b","Schlaf unruhig");
+  if (b.schlaf==="aufgewacht") add("b","aufgewacht"+(b.schlafZeiten&&b.schlafZeiten.length?(" "+b.schlafZeiten.join("/")):""));
+  if (b.schlaf==="gut") add("","😴 gut geschlafen");
+  if (b.urindrang && b.urindrang.ja) add("b","Urindrang");
+  if (out.length===0) out.push(el("span","tag muted","Eintrag ohne Marker"));
+  return out;
+}
+
+function hasBeschwerde(entry){
+  const b = entry.beschwerden || {};
+  return (b.bauchschmerzen&&b.bauchschmerzen.ja) || b.durchfall || b.blaehungen ||
+         (b.sonstigeVerdauung&&b.sonstigeVerdauung.ja) || (b.andere&&b.andere.ja) ||
+         (b.urindrang&&b.urindrang.ja) || b.schlaf==="unruhig" || b.schlaf==="aufgewacht";
+}
+
+// ---------- Formular ----------
+let current = null;
+
+function openForm(key){
+  const entry = store[key] ? JSON.parse(JSON.stringify(store[key])) : emptyEntry(key);
+  if (!Array.isArray(entry.stress)) entry.stress = [];
+  current = { key, entry };
+  buildForm();
+  document.getElementById("calView").classList.add("hidden");
+  document.getElementById("formView").classList.remove("hidden");
+  window.scrollTo(0,0);
+}
+function closeForm(){
+  current = null;
+  document.getElementById("formView").classList.add("hidden");
+  document.getElementById("calView").classList.remove("hidden");
+  if (viewMode==="month") renderCalendar(); else renderWeek();
+}
+
+function ynControl(getVal, setVal){
+  const wrap = el("div","yn");
+  const yes = el("button",null,"Ja");
+  const no  = el("button",null,"Nein");
+  function refresh(){ const v=getVal(); yes.className=v===true?"sel-yes":""; no.className=v===false?"sel-no":""; }
+  yes.addEventListener("click", ()=>{ setVal(getVal()===true?null:true); refresh(); });
+  no.addEventListener("click", ()=>{ setVal(getVal()===false?null:false); refresh(); });
+  wrap.appendChild(yes); wrap.appendChild(no); refresh();
+  return { wrap, refresh };
+}
+function timesControl(arr){
+  const container = el("div","times");
+  function render(){
+    container.innerHTML="";
+    arr.forEach((t,idx)=>{
+      const pill=el("div","time-pill");
+      const inp=el("input"); inp.type="time"; inp.value=t;
+      inp.addEventListener("input", ()=>{ arr[idx]=inp.value; });
+      const rm=el("button","rm","×");
+      rm.addEventListener("click", ()=>{ arr.splice(idx,1); render(); });
+      pill.appendChild(inp); pill.appendChild(rm); container.appendChild(pill);
+    });
+    const add=el("button","add-time","+ Uhrzeit");
+    add.addEventListener("click", ()=>{ arr.push(""); render(); });
+    container.appendChild(add);
+  }
+  render(); return container;
+}
+function field(qLabel){ const f=el("div","field"); f.appendChild(el("label","q",qLabel)); return f; }
+
+function buildForm(){
+  const host = document.getElementById("formView"); host.innerHTML="";
+  const e = current.entry;
+  const card = el("div","form-card");
+
+  const head = el("div","form-head");
+  head.appendChild(el("div","date-title", prettyDate(current.key)));
+  const back = el("button","ghost","‹ Zurück");
+  back.addEventListener("click", closeForm);
+  head.appendChild(back); card.appendChild(head);
+
+  const body = el("div","form-body");
+
+  body.appendChild(el("div","section-title","Einflussfaktoren"));
+  let f = field("Geraucht?"); f.appendChild(ynControl(()=>e.geraucht, v=>e.geraucht=v).wrap); body.appendChild(f);
+  f = field("Trainiert?"); f.appendChild(ynControl(()=>e.trainiert, v=>e.trainiert=v).wrap); body.appendChild(f);
+
+  f = field("Stress? (Mehrfachauswahl möglich)");
+  const stressChips=el("div","chips");
+  const stressOpts=[["morgens","Morgens"],["mittags","Mittags"],["abends","Abends"]];
+  stressOpts.forEach(([val,lab])=>{
+    const c=el("div","chip",lab); if(e.stress.includes(val)) c.classList.add("sel");
+    c.addEventListener("click", ()=>{
+      const i=e.stress.indexOf(val);
+      if(i>=0) e.stress.splice(i,1); else e.stress.push(val);
+      c.classList.toggle("sel");
+    });
+    stressChips.appendChild(c);
+  });
+  f.appendChild(stressChips); body.appendChild(f);
+
+  f = field("Was zu Mittag gegessen?");
+  const taMittag=el("textarea"); taMittag.value=e.mittagessen; taMittag.placeholder="z. B. Nudeln mit Tomatensauce…";
+  taMittag.addEventListener("input", ()=>e.mittagessen=taMittag.value); f.appendChild(taMittag); body.appendChild(f);
+
+  f = field("Was zum Abendessen gegessen?");
+  const taAbend=el("textarea"); taAbend.value=e.abendessen; taAbend.placeholder="z. B. Salat mit Hähnchen…";
+  taAbend.addEventListener("input", ()=>e.abendessen=taAbend.value); f.appendChild(taAbend); body.appendChild(f);
+
+  f = field("Proteinshake getrunken?");
+  f.appendChild(ynControl(()=>e.proteinshake.genommen, v=>e.proteinshake.genommen=v).wrap);
+  let sub=el("div","sub"); sub.appendChild(el("span","sub-label","Wann? (Uhrzeit(en))"));
+  sub.appendChild(timesControl(e.proteinshake.zeiten)); f.appendChild(sub); body.appendChild(f);
+
+  f = field("Kreatin genommen?");
+  f.appendChild(ynControl(()=>e.kreatin.genommen, v=>e.kreatin.genommen=v).wrap);
+  sub=el("div","sub"); sub.appendChild(el("span","sub-label","Wann? (Uhrzeit(en))"));
+  sub.appendChild(timesControl(e.kreatin.zeiten)); f.appendChild(sub); body.appendChild(f);
+
+  f = field("Tätigkeit vor dem Schlafengehen");
+  const pcRow=el("label","chk"); const pcCb=el("input"); pcCb.type="checkbox"; pcCb.checked=e.abend.pc;
+  const pcSub=el("div","sub"); pcSub.appendChild(el("span","sub-label","Bis welche Uhrzeit am PC?"));
+  const pcTime=el("input"); pcTime.type="time"; pcTime.value=e.abend.pcBis; pcTime.style.width="120px";
+  pcTime.addEventListener("input", ()=>e.abend.pcBis=pcTime.value); pcSub.appendChild(pcTime);
+  pcSub.style.display=e.abend.pc?"block":"none";
+  pcCb.addEventListener("change", ()=>{ e.abend.pc=pcCb.checked; pcSub.style.display=pcCb.checked?"block":"none"; });
+  pcRow.appendChild(pcCb); pcRow.appendChild(el("span",null,"Abends am PC gearbeitet"));
+  f.appendChild(pcRow); f.appendChild(pcSub);
+  const tvRow=el("label","chk"); const tvCb=el("input"); tvCb.type="checkbox"; tvCb.checked=e.abend.ferngesehen;
+  tvCb.addEventListener("change", ()=>e.abend.ferngesehen=tvCb.checked);
+  tvRow.appendChild(tvCb); tvRow.appendChild(el("span",null,"Ferngesehen")); f.appendChild(tvRow);
+  const soSub=el("div","field"); soSub.style.marginTop="8px";
+  soSub.appendChild(el("span","sub-label","Sonstiges (eintragen)"));
+  const soInp=el("input"); soInp.type="text"; soInp.value=e.abend.sonstiges; soInp.placeholder="z. B. gelesen, Handy…";
+  soInp.addEventListener("input", ()=>e.abend.sonstiges=soInp.value); soSub.appendChild(soInp);
+  f.appendChild(soSub); body.appendChild(f);
+
+  body.appendChild(el("div","section-title","Beschwerden"));
+  const b = e.beschwerden;
+
+  f = field("Bauchschmerzen?");
+  f.appendChild(ynControl(()=>b.bauchschmerzen.ja, v=>b.bauchschmerzen.ja=v).wrap);
+  sub=el("div","sub"); sub.appendChild(el("span","sub-label","Beschreibung (optional)"));
+  let bsTa=el("textarea"); bsTa.value=b.bauchschmerzen.beschreibung; bsTa.placeholder="z. B. krampfartig, nach dem Essen…";
+  bsTa.addEventListener("input", ()=>b.bauchschmerzen.beschreibung=bsTa.value); sub.appendChild(bsTa);
+  f.appendChild(sub); body.appendChild(f);
+
+  f = field("Durchfall?"); f.appendChild(ynControl(()=>b.durchfall, v=>b.durchfall=v).wrap); body.appendChild(f);
+  f = field("Blähungen?"); f.appendChild(ynControl(()=>b.blaehungen, v=>b.blaehungen=v).wrap); body.appendChild(f);
+
+  f = field("Sonstige Verdauungsbeschwerden?");
+  f.appendChild(ynControl(()=>b.sonstigeVerdauung.ja, v=>b.sonstigeVerdauung.ja=v).wrap);
+  sub=el("div","sub"); sub.appendChild(el("span","sub-label","Beschreibung (optional)"));
+  let svTa=el("textarea"); svTa.value=b.sonstigeVerdauung.beschreibung;
+  svTa.addEventListener("input", ()=>b.sonstigeVerdauung.beschreibung=svTa.value); sub.appendChild(svTa);
+  f.appendChild(sub); body.appendChild(f);
+
+  f = field("Andere Beschwerden?");
+  f.appendChild(ynControl(()=>b.andere.ja, v=>b.andere.ja=v).wrap);
+  sub=el("div","sub"); sub.appendChild(el("span","sub-label","Welche? (optional)"));
+  let anTa=el("textarea"); anTa.value=b.andere.welche; anTa.placeholder="z. B. Kopfschmerzen…";
+  anTa.addEventListener("input", ()=>b.andere.welche=anTa.value); sub.appendChild(anTa);
+  f.appendChild(sub); body.appendChild(f);
+
+  f = field("Wie war der Schlaf?");
+  const chips=el("div","chips");
+  const schlafOpts=[["gut","Gut"],["unruhig","Unruhig"],["aufgewacht","Aufgewacht"]];
+  const schlafZeitSub=el("div","sub"); schlafZeitSub.appendChild(el("span","sub-label","Um welche Uhrzeit(en) aufgewacht?"));
+  schlafZeitSub.appendChild(timesControl(b.schlafZeiten));
+  function refreshSchlafSub(){ schlafZeitSub.style.display=b.schlaf==="aufgewacht"?"block":"none"; }
+  schlafOpts.forEach(([val,lab])=>{
+    const c=el("div","chip",lab); if(b.schlaf===val)c.classList.add("sel");
+    c.addEventListener("click", ()=>{
+      b.schlaf=(b.schlaf===val?"":val);
+      chips.querySelectorAll(".chip").forEach((ch,i)=>ch.classList.toggle("sel", schlafOpts[i][0]===b.schlaf));
+      refreshSchlafSub();
+    });
+    chips.appendChild(c);
+  });
+  f.appendChild(chips); f.appendChild(schlafZeitSub); refreshSchlafSub(); body.appendChild(f);
+
+  f = field("Urindrang in der Nacht?");
+  f.appendChild(ynControl(()=>b.urindrang.ja, v=>b.urindrang.ja=v).wrap);
+  sub=el("div","sub"); sub.appendChild(el("span","sub-label","Beschreibung (optional, z. B. wie oft / Uhrzeit)"));
+  let udTa=el("textarea"); udTa.value=b.urindrang.beschreibung;
+  udTa.addEventListener("input", ()=>b.urindrang.beschreibung=udTa.value); sub.appendChild(udTa);
+  f.appendChild(sub); body.appendChild(f);
+
+  body.appendChild(el("div","section-title","Notiz (optional)"));
+  f = field("Sonstige Anmerkungen zum Tag");
+  const taNotiz=el("textarea"); taNotiz.value=e.notiz; taNotiz.addEventListener("input", ()=>e.notiz=taNotiz.value);
+  f.appendChild(taNotiz); body.appendChild(f);
+
+  card.appendChild(body);
+
+  const foot=el("div","form-foot");
+  const left=el("div");
+  const del=el("button","danger","Eintrag löschen");
+  del.addEventListener("click", deleteEntry);
+  if (store[current.key]) left.appendChild(del);
+  const right=el("div"); right.style.display="flex"; right.style.gap="8px"; right.style.alignItems="center";
+  const note=el("span","saved-note"); note.id="savedNote";
+  const save=el("button","primary","Speichern");
+  save.addEventListener("click", saveEntry);
+  right.appendChild(note); right.appendChild(save);
+  foot.appendChild(left); foot.appendChild(right); card.appendChild(foot);
+  host.appendChild(card);
+}
+
+function entryIsEmpty(e){
+  const b=e.beschwerden;
+  return e.geraucht===null && e.trainiert===null && (e.stress||[]).length===0 && !e.mittagessen && !e.abendessen &&
+    e.proteinshake.genommen===null && e.proteinshake.zeiten.length===0 &&
+    e.kreatin.genommen===null && e.kreatin.zeiten.length===0 &&
+    !e.abend.pc && !e.abend.ferngesehen && !e.abend.sonstiges &&
+    b.bauchschmerzen.ja===null && !b.bauchschmerzen.beschreibung &&
+    b.durchfall===null && b.blaehungen===null &&
+    b.sonstigeVerdauung.ja===null && !b.sonstigeVerdauung.beschreibung &&
+    b.andere.ja===null && !b.andere.welche &&
+    !b.schlaf && b.schlafZeiten.length===0 &&
+    b.urindrang.ja===null && !b.urindrang.beschreibung && !e.notiz;
+}
+function saveEntry(){
+  const e=current.entry;
+  e.proteinshake.zeiten=e.proteinshake.zeiten.filter(t=>t);
+  e.kreatin.zeiten=e.kreatin.zeiten.filter(t=>t);
+  e.beschwerden.schlafZeiten=e.beschwerden.schlafZeiten.filter(t=>t);
+  if (entryIsEmpty(e)) delete store[current.key];
+  else { e.updatedAt=new Date().toISOString(); store[current.key]=e; }
+  saveAll(store);
+  document.getElementById("savedNote").textContent="✓ Gespeichert";
+  setTimeout(closeForm, 450);
+}
+function deleteEntry(){
+  if (confirm("Diesen Tageseintrag wirklich löschen?")) { delete store[current.key]; saveAll(store); closeForm(); }
+}
+
+// ---------- Export / Import ----------
+function exportJson(){
+  const payload = { app:"gesundheitsapp", version:1, exportedAt:new Date().toISOString(),
+    entries: Object.keys(store).sort().map(k=>store[k]) };
+  download(JSON.stringify(payload,null,2), "gesundheits-tagebuch_"+todayKey()+".json", "application/json");
+}
+function exportCsv(){
+  const cols=["date","geraucht","trainiert","stress","mittagessen","abendessen","proteinshake","proteinshake_zeiten",
+    "kreatin","kreatin_zeiten","abend_pc","abend_pc_bis","abend_tv","abend_sonstiges","bauchschmerzen",
+    "bauchschmerzen_beschr","durchfall","blaehungen","sonstige_verdauung","sonstige_verdauung_beschr",
+    "andere","andere_welche","schlaf","schlaf_zeiten","urindrang","urindrang_beschr","notiz"];
+  const yn=v=>v===true?"ja":(v===false?"nein":"");
+  const rows=Object.keys(store).sort().map(k=>{ const e=store[k],b=e.beschwerden;
+    return [e.date,yn(e.geraucht),yn(e.trainiert),(e.stress||[]).join(" "),e.mittagessen,e.abendessen,yn(e.proteinshake.genommen),
+      e.proteinshake.zeiten.join(" "),yn(e.kreatin.genommen),e.kreatin.zeiten.join(" "),
+      e.abend.pc?"ja":"",e.abend.pcBis,e.abend.ferngesehen?"ja":"",e.abend.sonstiges,
+      yn(b.bauchschmerzen.ja),b.bauchschmerzen.beschreibung,yn(b.durchfall),yn(b.blaehungen),
+      yn(b.sonstigeVerdauung.ja),b.sonstigeVerdauung.beschreibung,yn(b.andere.ja),b.andere.welche,
+      b.schlaf,b.schlafZeiten.join(" "),yn(b.urindrang.ja),b.urindrang.beschreibung,e.notiz]; });
+  const esc=s=>'"'+String(s==null?"":s).replace(/"/g,'""')+'"';
+  const csv=[cols.join(","),...rows.map(r=>r.map(esc).join(","))].join("\r\n");
+  download("﻿"+csv, "gesundheits-tagebuch_"+todayKey()+".csv", "text/csv");
+}
+function download(content, filename, type){
+  const blob=new Blob([content],{type}); const url=URL.createObjectURL(blob);
+  const a=document.createElement("a"); a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+function importJson(file){
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try {
+      const data=JSON.parse(reader.result);
+      const entries=Array.isArray(data)?data:data.entries;
+      if (!Array.isArray(entries)) throw new Error("Kein gültiges Export-Format (entries fehlt).");
+      let added=0,updated=0;
+      entries.forEach(en=>{
+        if(!en||!en.date) return;
+        const base=emptyEntry(en.date);
+        const merged=Object.assign(base, en);
+        merged.beschwerden=Object.assign(base.beschwerden, en.beschwerden||{});
+        merged.proteinshake=Object.assign({genommen:null,zeiten:[]}, en.proteinshake||{});
+        merged.kreatin=Object.assign({genommen:null,zeiten:[]}, en.kreatin||{});
+        merged.abend=Object.assign({pc:false,pcBis:"",ferngesehen:false,sonstiges:""}, en.abend||{});
+        if (store[en.date]) updated++; else added++;
+        store[en.date]=merged;
+      });
+      saveAll(store);
+      if (viewMode==="month") renderCalendar(); else renderWeek();
+      alert("Import erfolgreich: "+added+" neu, "+updated+"überschrieben.");
+    } catch(err){ alert("Import fehlgeschlagen: "+err.message); }
+  };
+  reader.readAsText(file);
+}
+
+// ---------- Events ----------
+document.getElementById("modeMonth").addEventListener("click", ()=>setMode("month"));
+document.getElementById("modeWeek").addEventListener("click", ()=>setMode("week"));
+document.getElementById("prevMonth").addEventListener("click", ()=>{ viewMonth--; if(viewMonth<0){viewMonth=11;viewYear--;} renderCalendar(); });
+document.getElementById("nextMonth").addEventListener("click", ()=>{ viewMonth++; if(viewMonth>11){viewMonth=0;viewYear++;} renderCalendar(); });
+document.getElementById("prevWeek").addEventListener("click", ()=>{ weekRef=addDays(mondayOf(weekRef),-7); renderWeek(); });
+document.getElementById("nextWeek").addEventListener("click", ()=>{ weekRef=addDays(mondayOf(weekRef),7); renderWeek(); });
+document.getElementById("btnToday").addEventListener("click", ()=>openForm(todayKey()));
+document.getElementById("btnExport").addEventListener("click", exportJson);
+document.getElementById("btnExportCsv").addEventListener("click", exportCsv);
+document.getElementById("btnImport").addEventListener("click", ()=>document.getElementById("fileInput").click());
+document.getElementById("fileInput").addEventListener("change", (ev)=>{ if(ev.target.files[0]) importJson(ev.target.files[0]); ev.target.value=""; });
+
+// ---------- Start ----------
+renderDow();
+renderCalendar();
+</script>
+</body>
+</html>
